@@ -1,53 +1,74 @@
+from colorama import Fore, Style, init
 import socket
 import sys
-import os
+import argparse
 
-RED = '\033[91m'
-GREEN = '\033[92m'
-YELLOW = '\033[93m'
-BLUE = '\033[94m'
-BOLD = '\033[1m'
-CYAN = '\033[96m'
-RESET = '\033[0m'
-redfox = f"{BOLD}{RED}RED FOX{RESET}"
-dns = f"{BOLD}{GREEN}DNS RESOLVER{RESET}"
-seta = f"{GREEN}===========>{RESET}"
+init(autoreset= True)
 
-banner = f""" {RED}
+def main_menu():
+    banner = f"""{Fore.RED}
  __   ___  __      ___  __                __        __      __   ___  __   __                  >
 |__) |__  |  \    |__  /  \ \_/    __    |  \ |\ | /__`    |__) |__  /__` /  \ |    \  / |__  |__) 
 |  \ |___ |__/    |    \__/ / \          |__/ | \| .__/    |  \ |___ .__/ \__/ |___  \/  |___ |  \ 
-                                                                                                   
-                                                                                        {RESET} """
 
-print(banner)
-print(redfox + " - " + dns)
+{Fore.CYAN}github.com/foxzinnx                                                                        
+"""
+    print(banner)
+    print(f"{Fore.RED}{Style.BRIGHT}RED FOX {Style.RESET_ALL}- {Style.BRIGHT}{Fore.GREEN}DNS RESOLVER")
 
-if len(sys.argv) <= 1:
-    print(f"{BOLD}Modo de uso:{RESET}")
-    print(f"{BOLD}1 - Python dnsresolver.py google.com{RESET}")
-    print(f"{BOLD}2 - Python dnsresolver.py sites.txt{RESET}")
-    sys.exit(1)
 
-input_file = sys.argv[1]
-
-if os.path.isfile(input_file):
-    with open(input_file, 'r') as file:
-        sites = file.readlines()
-        for site in sites:
-            site = site.strip()  # Remover espaços em branco e quebras de linha
-            print(f"{BOLD}{YELLOW}{site}{RESET}", seta, end=' ')
-            try:
-                ip_address = socket.gethostbyname(site)
-                print(f"{BOLD}{CYAN}{ip_address}{RESET}")
-            except socket.gaierror:
-                print(f"{BOLD}{RED}Erro: Não foi possível resolver o DNS para este site{RESET}")
-else:
-    site = sys.argv[1]
-    print(f"{BOLD}{YELLOW}{site}{RESET}", seta, end=' ')
+def resolver_wordlist(wordlist):   
     try:
-        ip_address = socket.gethostbyname(site)
-        print(f"{BOLD}{CYAN}{ip_address}{RESET}")
+        with open(wordlist, 'r') as file:
+            sites = file.readlines()
+            print(f"{Fore.GREEN}Resolving DNS for the sites....\n____________________________\n")
+            for site in sites:
+                site = site.strip() 
+                try:
+                    ip_address = socket.gethostbyname(site)
+                    print(f"{Fore.CYAN}{site}: {Fore.GREEN}{ip_address}")
+                except socket.gaierror:
+                    print(f"{Fore.RED}{site}: {Style.BRIGHT}Unable to resolve DNS for this site.")
+    except FileNotFoundError:
+        print(f"{Fore.RED}Error: The file {wordlist} was not found.")
+        sys.exit(1)
+
+def resolver_target(target):
+    print(f"{Fore.GREEN}Resolving DNS for this website: {Fore.LIGHTYELLOW_EX}{target}{Fore.GREEN}\n____________________________\n")
+    try:
+        ip_address = socket.gethostbyname(target)
+        print(f"{Fore.CYAN}{target}: {Fore.GREEN}{ip_address}")
     except socket.gaierror:
-        print(f"{BOLD}{RED}Erro: Não foi possível resolver o DNS para este site{RESET}")
-print(f"{BOLD}{BLUE}github.com/foxzinnx{RESET}")
+        print(f"{Fore.RED}{target}: {Style.BRIGHT}Unable to resolve DNS for this site.")
+
+def main():
+    main_menu()
+
+    if len(sys.argv) <= 1:
+        print(f"{Style.BRIGHT}Usage:")
+        print(f"{Style.BRIGHT}1 - Python dnsresolver.py -t google.com")
+        print(f"{Style.BRIGHT}2 - Python dnsresolver.py -w wordlist.txt")
+        sys.exit(1)
+
+    parser = argparse.ArgumentParser(description=f"{Fore.RED}RED FOX {Style.RESET_ALL}- {Fore.GREEN}DNS RESOLVER")
+    parser.add_argument("-t", "--target", required=False, help=f"{Style.BRIGHT}Target Website")
+    parser.add_argument("-w", "--wordlist", required=False, help=f"{Style.BRIGHT}Wordlist file")
+
+    args = parser.parse_args()
+    target = args.target
+    wordlist = args.wordlist
+
+    if target and wordlist:
+        print(f"{Fore.RED}Error: You cannot use both -t and -w arguments simultaneously. Please choose only one.")
+        print(f"Example: python dnsresolver.py -t google.com OR python dnsresolver.py -w wordlist.txt")
+        sys.exit(1)
+
+    if target:
+        resolver_target(target)
+    elif wordlist:
+        resolver_wordlist(wordlist)
+    else:
+        print(f"{Style.BRIGHT}Erro: Você deve fornecer um target (-t) ou uma wordlist (-w)")
+
+if __name__ == "__main__":
+    main()

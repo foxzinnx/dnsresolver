@@ -1,5 +1,6 @@
 from colorama import Fore, Style, init
 import socket
+import sys
 import argparse
 
 init(autoreset= True)

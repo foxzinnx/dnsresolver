@@ -1,13 +1,12 @@
 from colorama import Fore, Style, init
 import socket
-import sys
 import argparse
 
 init(autoreset= True)
 
 def main_menu():
     banner = f"""{Fore.RED}
- __   ___  __      ___  __                __        __      __   ___  __   __                  >
+ __   ___  __      ___  __                __        __      __   ___  __   __             __     >
 |__) |__  |  \    |__  /  \ \_/    __    |  \ |\ | /__`    |__) |__  /__` /  \ |    \  / |__  |__) 
 |  \ |___ |__/    |    \__/ / \          |__/ | \| .__/    |  \ |___ .__/ \__/ |___  \/  |___ |  \ 
 
@@ -68,7 +67,7 @@ def main():
     elif wordlist:
         resolver_wordlist(wordlist)
     else:
-        print(f"{Style.BRIGHT}Erro: Você deve fornecer um target (-t) ou uma wordlist (-w)")
+        print(f"{Style.BRIGHT}Error: You must provide a target (-t) or a wordlist (-w)")
 
 if __name__ == "__main__":
     main()
